@@ -1,0 +1,25 @@
+body {
+  background-color: whitesmoke;
+}
+.doclist {
+  margin-left: 13rem;
+  margin-top: 2rem;
+  border-top: 1px solid #ccc;
+}
+.header {
+  display: flex;
+  flex-direction: row;
+  margin-left: 2rem;
+}
+
+.sort {
+  margin-left: 35rem;
+}
+
+.eachdoc {
+  width: 9.8rem;
+  height: 13rem;
+  margin: 1rem;
+  background-color: white;
+  cursor: pointer;
+}

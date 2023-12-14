@@ -1,0 +1,36 @@
+.Add-doc {
+  width: 9.8rem;
+  height: 13rem;
+  margin: 1rem;
+  background-color: white;
+  cursor: pointer;
+}
+
+.homepage {
+  background-color: whitesmoke;
+  height: 20.3rem;
+  border-top: 1px solid #ccc;
+}
+
+.allcards {
+  margin-left: 13rem;
+  display: flex;
+  flex-direction: row;
+}
+
+.text {
+  display: flex;
+  margin-left: 1rem;
+  /* margin-top: 0px; */
+  margin-bottom: 1rem;
+}
+
+.head {
+  display: flex;
+  flex-direction: row;
+  margin-left: 15rem;
+}
+
+.doctitle {
+  margin-left: 35rem;
+}

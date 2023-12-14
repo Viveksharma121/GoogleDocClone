@@ -1,0 +1,179 @@
+//mui icons
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import ShareIcon from "@mui/icons-material/Share";
+import Fab from "@mui/material/Fab";
+//axios to fetch form backend
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+//React quill for doc
+import { default as ReactQuill } from "react-quill";
+import "react-quill/dist/quill.snow.css";
+import { useLocation, useParams } from "react-router-dom";
+//socketio for connections and room forming
+import socketioClient from "socket.io-client";
+//css for the page
+import "./DocPage.css";
+// modal
+import Modal from "./Modal/Modal";
+const DocPage = () => {
+  //Accesses the document id form the link so if link is http://localhost:3000/doc/d27284b3-e364-4a92-9b19-50d442884d91 , it accesses doc/d27284b3-e364-4a92-9b19-50d442884d91
+  const docId1 = useParams();
+  // to get the id from the docId1 "d27284b3-e364-4a92-9b19-50d442884d91"
+  const docId = docId1.docId;
+
+  console.log(docId);
+  //value here is content of the page
+  const [value, setValue] = useState("");
+  //socket to check and establist connection
+  const [socket, setsocket] = useState(null);
+  //to check if modal is open on not
+  const [ismodelOpen, setismodelOpen] = useState(false);
+
+  //Quill tools
+  const modules = {
+    clipboard: {
+      matchVisual: false,
+      preserveWhitespace: true,
+    },
+    toolbar: [
+      [{ header: [1, 2, 3, 4, 5, 6, false] }],
+      [{ font: [] }],
+      [{ list: "ordered" }, { list: "bullet" }],
+      [{ script: "sub" }, { script: "super" }],
+      ["bold", "italic", "underline"],
+      ["link"],
+      [{ align: [] }],
+      ["image", "blockquote", "code-block"],
+      ["clean"],
+      ["share-button"],
+    ],
+  };
+
+  //when user X shares his doc to user Y or himself reloads the doc , this func will fetch all data from backend whenever the site is reloaded
+  const fetchInitialContent = async () => {
+    try {
+      //simple get request
+      const response = await axios.get(
+        `http://localhost:9000/get-doc-content/${docId}`
+      );
+      //extracting the data from response
+      const data = response.data;
+      // data: content: "<p>iv </p><p>gi </p><p>vivek </p>"
+      // so we do data.content to get this content from data
+      setValue(data.content);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+  useEffect(() => {
+    console.log("useEffect is running");
+
+    //creates a new Websocket connection
+    const newSocket = socketioClient("http://localhost:5000", {
+      //optional
+      transports: ["websocket"],
+    });
+
+    // when connected log socket connected and fetch the initial contents
+    newSocket.on("connect", () => {
+      console.log("Socket connected!");
+      fetchInitialContent();
+    });
+
+    //emit==send , ie send the docId to the backend
+    newSocket.emit("join-doc", docId);
+    //if there is error in connection log that
+    newSocket.on("connect_error", (error) => {
+      console.error("Socket connection error:", error);
+    });
+
+    //whenever dpcument changes are made just set the value to the data
+    newSocket.on("doc-changes", (data) => {
+      console.log("use eff data ", data);
+      setValue(data);
+    });
+
+    //just simply setting the socket
+    setsocket(newSocket);
+    //cleanup when use effect is exited(ie page closed) we close the socket
+    return () => {
+      newSocket.disconnect();
+    };
+  }, [docId]);
+
+  // whenever user writes something or changees something this function is called
+  const handleChanges = (content, _, source) => {
+    // this checks if changes are made by our user only its default in react quill
+    if (source === "user") {
+      //we set the value to whatever changes ie content is typed , content is also inbuilt
+      setValue(content);
+      if (socket) {
+        //sending the changes to backend to save it to db
+        socket.emit("doc-changes", { docId, content });
+      }
+    }
+  };
+
+  //As soon as share icon is clicked this function is called and the modal opens up
+  const handleShare = () => {
+    setismodelOpen(true);
+    console.log("share btn clicked");
+  };
+  //gives all info of page
+  const PageUrl = useLocation();
+
+  //when modal is closed we call this
+  const handleCloseModal = () => {
+    setismodelOpen(false);
+  };
+  return (
+    <div>
+      {/* Basic share icon from mui */}
+      <Fab
+        style={{
+          marginTop: "0.5rem",
+          marginRight: "10rem",
+          float: "right",
+          cursor: "pointer",
+        }}
+        size="small"
+        color="primary"
+        aria-label="share"
+        onClick={handleShare}
+      >
+        <ShareIcon />
+      </Fab>
+      {/* Basic acc icon from mui*/}
+      <Fab
+        style={{
+          marginTop: "0.5rem",
+          marginRight: "-6rem",
+          float: "right",
+          cursor: "pointer",
+        }}
+        size="small"
+        color="primary"
+        aria-label="share"
+      >
+        <AccountCircleIcon />
+      </Fab>
+      {/* Our react quill */}
+      <div className="container">
+        <ReactQuill
+          theme="snow"
+          value={value}
+          onChange={handleChanges}
+          modules={modules}
+        />
+      </div>
+      {/*Modal page and some things are passed as props */}
+      <Modal
+        isOpen={ismodelOpen}
+        onClose={handleCloseModal}
+        urlToShare={`http://localhost:3000${PageUrl.pathname}`}
+      />
+    </div>
+  );
+};
+
+export default DocPage;
