@@ -28,8 +28,67 @@ const DocSchema = new mongoose.Schema({
     unique: true,
   },
   content: { type: String, default: "" },
+  accessControl: [
+    {
+      userEmail: { type: String, required: true },
+      accessLevel: {
+        type: String,
+        enum: ["read-only", "write-only"],
+        default: "read-only",
+      },
+    },
+  ],
+});
+const UserSchema = new mongoose.Schema({
+  username: String,
+  email: String,
+  password: String,
+});
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true },
+  bio: { type: String },
 });
 
-const Document = mongoose.model("Document", DocSchema);
+const DocAccessSchema = new mongoose.Schema({
+  docId: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  accessControl: [
+    {
+      userEmail: { type: String, required: true },
+      accessLevel: {
+        type: String,
+        enum: ["read", "Edit"],
+        default: "read",
+      },
+    },
+  ],
+});
 
-module.exports = { db, Document };
+const AccessRequest = new mongoose.Schema({
+  docId: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  accessControl: [
+    {
+      userEmail: { type: String, required: true },
+      accessLevel: {
+        type: String,
+        enum: ["read", "Edit"],
+        default: "read",
+      },
+    },
+  ],
+});
+
+const UserProfile = mongoose.model("UserProfile", userSchema);
+const Document = mongoose.model("Document", DocSchema);
+const Users = mongoose.model("User", UserSchema);
+const DocAccess = mongoose.model("Access", DocAccessSchema);
+const AccessReq = mongoose.model("Access-Request", AccessRequest);
+
+module.exports = { db, Document, Users, UserProfile, DocAccess, AccessReq };

@@ -1,0 +1,70 @@
+/* UserProfile.css */
+
+.user-profile {
+  max-width: 600px;
+  margin: 20px auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  text-align: center;
+}
+
+.avatar-container {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.avatar-image {
+  margin-bottom: 10px;
+}
+
+.edit-avatar-icon {
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: pointer;
+}
+
+.profile-info {
+  text-align: left;
+}
+
+.username {
+  font-size: 1.5rem;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+}
+
+.edit-username-icon {
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.bio {
+  margin-top: 20px;
+}
+
+.edit-bio-icon {
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+textarea {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 10px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}

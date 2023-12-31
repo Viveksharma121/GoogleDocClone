@@ -1,25 +1,40 @@
-body {
-  background-color: whitesmoke;
-}
 .doclist {
-  margin-left: 13rem;
-  margin-top: 2rem;
-  border-top: 1px solid #ccc;
+  /* margin-left: 13rem; */
+  background-color: whitesmoke;
+  /* border: 1px solid black; */
+  /* background-color: yellow; */
+  margin-top: -2rem;
+  height: 20rem;
+}
+.content {
+  /* border: 1px solid black; */
+  margin: 2rem 15rem;
 }
 .header {
   display: flex;
   flex-direction: row;
-  margin-left: 2rem;
+  margin-left: 1.5rem;
+  margin-top: 0rem;
 }
-
+.alldocs {
+  margin-top: 0.8rem;
+}
 .sort {
-  margin-left: 35rem;
+  margin-left: 45rem;
 }
 
 .eachdoc {
   width: 9.8rem;
   height: 13rem;
-  margin: 1rem;
+  margin-top: 0%;
+  margin-left: 1rem;
+  margin-bottom: -2rem;
   background-color: white;
   cursor: pointer;
+}
+/* .alldoc {
+  border: 1px solid black;
+} */
+.eachdoc:hover {
+  border: 0.1px solid blue;
 }

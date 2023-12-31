@@ -1,34 +1,57 @@
 .Add-doc {
-  width: 9.8rem;
+  width: 12rem;
   height: 13rem;
-  margin: 1rem;
+  margin: 0rem;
   background-color: white;
+  border: 1px whitesmoke;
   cursor: pointer;
 }
 
 .homepage {
-  background-color: whitesmoke;
-  height: 20.3rem;
+  background-color: white;
   border-top: 1px solid #ccc;
+  margin-left: 0rem;
+
+  /* border: 1px solid black; */
 }
 
 .allcards {
-  margin-left: 13rem;
-  display: flex;
-  flex-direction: row;
+  width: 80%; /* Adjust the width as needed */
+  margin: 0 auto; /* Center the container */
 }
 
-.text {
+.row {
   display: flex;
-  margin-left: 1rem;
-  /* margin-top: 0px; */
-  margin-bottom: 1rem;
+  gap: 1rem;
+  justify-content: flex-start;
+}
+
+.onedoc {
+  width: 12rem;
+  height: 18rem;
+  margin: 1rem;
+  display: flex;
+
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+  /* border: 1px solid black; */
+  flex-direction: column;
+  cursor: pointer;
+  transition: border-color 0.3s ease-in-out;
+  border: 1px solid transparent;
+}
+.onedoc:hover {
+  border-color: blue; /* Change border color on hover */
+}
+.text {
+  margin: 0.2rem;
+  background-color: white;
+  border-top: 1px solid whitesmoke;
 }
 
 .head {
   display: flex;
   flex-direction: row;
-  margin-left: 15rem;
+  margin-left: 11rem;
 }
 
 .doctitle {

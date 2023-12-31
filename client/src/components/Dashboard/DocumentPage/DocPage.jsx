@@ -1,5 +1,7 @@
 //mui icons
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
+import MarkEmailUnreadIcon from "@mui/icons-material/MarkEmailUnread";
 import ShareIcon from "@mui/icons-material/Share";
 import Fab from "@mui/material/Fab";
 //axios to fetch form backend
@@ -8,12 +10,14 @@ import React, { useEffect, useState } from "react";
 //React quill for doc
 import { default as ReactQuill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
-import { useLocation, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 //socketio for connections and room forming
 import socketioClient from "socket.io-client";
 //css for the page
 import "./DocPage.css";
 // modal
+import AccessRequestsModal from "./AccessDenied/AccessReqModal";
+import MenuBar from "./MenuBar";
 import Modal from "./Modal/Modal";
 const DocPage = () => {
   //Accesses the document id form the link so if link is http://localhost:3000/doc/d27284b3-e364-4a92-9b19-50d442884d91 , it accesses doc/d27284b3-e364-4a92-9b19-50d442884d91
@@ -22,12 +26,77 @@ const DocPage = () => {
   const docId = docId1.docId;
 
   console.log(docId);
+  const history = useNavigate();
+
   //value here is content of the page
   const [value, setValue] = useState("");
   //socket to check and establist connection
   const [socket, setsocket] = useState(null);
   //to check if modal is open on not
   const [ismodelOpen, setismodelOpen] = useState(false);
+
+  const [accessControl, setAccessControl] = useState(true);
+  const [owner, setOwner] = useState(false);
+  const [acessReq, setacessReq] = useState([]);
+  useEffect(() => {
+    const fetchAcessControl = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:9000/api/share/getusers/${docId}`
+        );
+        console.log(response);
+        const data = response.data.accessControl;
+        console.log(data);
+        const ourUser = sessionStorage.getItem("email");
+        console.log(ourUser);
+        if (ourUser === null && data === undefined) {
+          console.log(accessControl);
+          setAccessControl(true);
+          return;
+        }
+        const userpermission = data.find((user) => user.userEmail === ourUser);
+        console.log(userpermission);
+
+        if (userpermission.userEmail === ourUser) {
+          if (
+            userpermission.accessLevel === "edit" ||
+            userpermission.accessLevel === "owner"
+          ) {
+            setAccessControl(false);
+            if (userpermission.accessLevel === "owner") setOwner(true);
+          } else if (
+            userpermission.accessLevel === "read" ||
+            userpermission.accessLevel === "everyone"
+          ) {
+            setAccessControl(true);
+          }
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    };
+    fetchAcessControl();
+
+    //one more
+    const handleAccess = async () => {
+      const response = await axios.get(
+        "http://localhost:9000/api/access/get-access-request",
+        {
+          params: {
+            docId: docId,
+          },
+        }
+      );
+      console.log(response);
+      if (response.data.message != null)
+        setacessReq(response.data.message.accessControl);
+      else setacessReq([]);
+      // console.log(response.data.message.accessControl);
+      // setUsers(response.data.message.userEmail);
+      // console.log(users.length);1
+    };
+    handleAccess();
+  }, [docId]);
 
   //Quill tools
   const modules = {
@@ -45,7 +114,6 @@ const DocPage = () => {
       [{ align: [] }],
       ["image", "blockquote", "code-block"],
       ["clean"],
-      ["share-button"],
     ],
   };
 
@@ -116,8 +184,20 @@ const DocPage = () => {
 
   //As soon as share icon is clicked this function is called and the modal opens up
   const handleShare = () => {
+    if (accessControl) {
+      history(`/access-denied/${docId}`);
+      return;
+    }
     setismodelOpen(true);
     console.log("share btn clicked");
+  };
+
+  const [isReqmodelOpen, setisReqmodelOpen] = useState(false);
+  const ReqModal = () => {
+    setisReqmodelOpen(true);
+  };
+  const handleReqModalClose = () => {
+    setisReqmodelOpen(false);
   };
   //gives all info of page
   const PageUrl = useLocation();
@@ -128,11 +208,12 @@ const DocPage = () => {
   };
   return (
     <div>
+      <MenuBar />
       {/* Basic share icon from mui */}
       <Fab
         style={{
           marginTop: "0.5rem",
-          marginRight: "10rem",
+          marginRight: "9rem",
           float: "right",
           cursor: "pointer",
         }}
@@ -141,7 +222,7 @@ const DocPage = () => {
         aria-label="share"
         onClick={handleShare}
       >
-        <ShareIcon />
+        {accessControl === true ? <AddCircleIcon /> : <ShareIcon />}
       </Fab>
       {/* Basic acc icon from mui*/}
       <Fab
@@ -157,6 +238,28 @@ const DocPage = () => {
       >
         <AccountCircleIcon />
       </Fab>
+      {owner && acessReq.length > 0 && (
+        <Fab
+          style={{
+            marginTop: "0.5rem",
+            marginRight: "1rem",
+            float: "right",
+            cursor: "pointer",
+          }}
+          size="small"
+          color="primary"
+          aria-label="share"
+          onClick={ReqModal}
+        >
+          <MarkEmailUnreadIcon />
+          <AccessRequestsModal
+            isOpen={isReqmodelOpen}
+            onClose={() => setisReqmodelOpen(false)}
+            usersReq={acessReq}
+          />
+        </Fab>
+      )}
+
       {/* Our react quill */}
       <div className="container">
         <ReactQuill
@@ -164,6 +267,7 @@ const DocPage = () => {
           value={value}
           onChange={handleChanges}
           modules={modules}
+          readOnly={accessControl}
         />
       </div>
       {/*Modal page and some things are passed as props */}

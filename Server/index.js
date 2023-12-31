@@ -1,11 +1,14 @@
 const { Server } = require("socket.io");
-const { db, Document } = require("./Db/db");
+const { db, Document, UserProfile } = require("./Db/db");
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
+const bodyParser = require("body-parser");
 const path = require("path");
 const app = express();
 app.use(cors());
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 const PORT = 5000;
 const PORT1 = 9000;
 const uploadPath = "Images";
@@ -25,6 +28,13 @@ const io = new Server(PORT, {
   },
 });
 
+const user_route = require("./Routes/Auth");
+const share_route = require("./Routes/Share");
+const access_route = require("./Routes/DocAccess");
+app.use("/api/access", access_route);
+app.use("/api/user", user_route);
+app.use("/api/share", share_route);
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "Images");
@@ -38,35 +48,7 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage });
 app.use("/uploads", express.static(uploadPath));
 
-//chatgpt code
-// app.post("/update-doc/:docId", upload.single("Images"), async (req, res) => {
-//   const docId = req.params.docId;
-//   const { content } = req.body;
-//   const imageUrl = req.file ? req.file.path : null;
-
-//   try {
-//     let document = await Document.findOne({ docId });
-
-//     if (!document) {
-//       document = new Document({ docId });
-//     }
-
-//     document.content = content;
-
-//     if (imageUrl) {
-//       document.images.push(imageUrl);
-//     }
-
-//     await document.save();
-//     res.json({ message: "Update successful" });
-
-//     // Broadcast changes to connected clients
-//     io.to(docId).emit("doc-changes", { content, images: document.images });
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// });
+//access perm
 
 //code to save to db
 app.get("/get-doc-content/:docId", async (req, res) => {
@@ -103,11 +85,17 @@ io.on("connection", (socket) => {
     const { docId, content } = data;
     console.log("Received data from client:", content);
 
+    const accessControl = [
+      { userEmail: "viv@gmail.com", accessLevel: "read-write" },
+      { userEmail: "lol@gmail.com", accessLevel: "read" },
+      { userEmail: "xyz@gmail.com", accessLevel: "read-write" },
+    ];
+
     console.log("Content to broadcast:", content);
     clearTimeout(saveTimeouts[docId]);
 
     saveTimeouts[docId] = setTimeout(() => {
-      saveDocument(docId, content);
+      saveDocument(docId, content, accessControl);
     }, 1000);
     io.to(docId).emit("doc-changes", content);
   });
@@ -116,15 +104,26 @@ io.on("connection", (socket) => {
   });
 });
 
-async function saveDocument(docId, content) {
+async function saveDocument(docId, content, accessControl) {
   try {
     await Document.findOneAndUpdate(
       { docId: docId },
-      { content: content },
+      { content: content, accessControl: accessControl },
       { upsert: true }
     );
+
     console.log("saved doc");
   } catch (error) {
     console.log(error);
   }
 }
+
+app.delete("/del", async (req, res) => {
+  try {
+    const result = await UserProfile.deleteMany();
+    res.json({ message: `Deleted ${result.deletedCount} documents` });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Internal Server Error" });
+  }
+});
