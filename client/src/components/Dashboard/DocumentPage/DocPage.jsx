@@ -60,6 +60,7 @@ const DocPage = () => {
         if (userpermission.userEmail === ourUser) {
           if (
             userpermission.accessLevel === "edit" ||
+            userpermission.accessLevel === "Edit" ||
             userpermission.accessLevel === "owner"
           ) {
             setAccessControl(false);
