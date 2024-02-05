@@ -1,5 +1,5 @@
 const { Server } = require("socket.io");
-const { db, Document, UserProfile } = require("./Db/db");
+const { db, Document, UserProfile, DocNameModel } = require("./Db/db");
 const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
@@ -31,10 +31,11 @@ const io = new Server(PORT, {
 const user_route = require("./Routes/Auth");
 const share_route = require("./Routes/Share");
 const access_route = require("./Routes/DocAccess");
+const summary_route = require("./Routes/Summariser");
 app.use("/api/access", access_route);
 app.use("/api/user", user_route);
 app.use("/api/share", share_route);
-
+app.use("/api/sum", summary_route);
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, "Images");
@@ -80,7 +81,6 @@ io.on("connection", (socket) => {
   socket.on("disconnect", () => {
     console.log("User disconnected:", socket.id);
   });
-
   socket.on("doc-changes", (data) => {
     const { docId, content } = data;
     console.log("Received data from client:", content);
@@ -125,5 +125,52 @@ app.delete("/del", async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
+  }
+});
+
+app.post("doc-name", async (req, res) => {
+  const { docId, document_name } = req.body;
+  try {
+    const existingDoc = await DocNameModel.findOne({ docId });
+    if (existingDoc) {
+      await DocNameModel.updateOne(
+        { docId },
+        { $set: { docName: document_name } }
+      );
+    } else {
+      await DocNameModel.create({ docId, docName: document_name });
+    }
+    res
+      .status(200)
+      .json({ success: true, message: "Document name saved successfully." });
+  } catch (error) {
+    console.error("Error saving document name:", error);
+    res.status(500).json({ success: false, message: "Internal server error." });
+  }
+});
+
+app.post("/doc-name", async (req, res) => {
+  try {
+    const { docId, docName } = req.body;
+    const newDoc = new DocNameModel({
+      docId: docId,
+      docName: docName,
+    });
+    await newDoc.save();
+    res.json({ message: newDoc });
+  } catch (error) {
+    res.json({ message: error });
+  }
+});
+
+app.get("/doc-name", async (req, res) => {
+  try {
+    const docId = req.query.docId;
+    console.log(req.query);
+    console.log(docId);
+    const response = await DocNameModel.findOne({ docId: docId });
+    res.json(response);
+  } catch (error) {
+    res.json({ message: error });
   }
 });

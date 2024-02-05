@@ -99,6 +99,12 @@ const DocPage = () => {
     handleAccess();
   }, [docId]);
 
+  //text to voice
+  const textTovoice = async () => {
+    console.log(value);
+    const utterance = new SpeechSynthesisUtterance(value);
+    window.speechSynthesis.speak(utterance);
+  };
   //Quill tools
   const modules = {
     clipboard: {
@@ -207,9 +213,10 @@ const DocPage = () => {
   const handleCloseModal = () => {
     setismodelOpen(false);
   };
+
   return (
     <div>
-      <MenuBar />
+      <MenuBar QuillData={value} />
       {/* Basic share icon from mui */}
       <Fab
         style={{
@@ -277,6 +284,7 @@ const DocPage = () => {
         onClose={handleCloseModal}
         urlToShare={`http://localhost:3000${PageUrl.pathname}`}
       />
+      <button onClick={textTovoice}>Text to voice</button>
     </div>
   );
 };

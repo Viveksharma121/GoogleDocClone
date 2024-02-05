@@ -85,10 +85,32 @@ const AccessRequest = new mongoose.Schema({
   ],
 });
 
+const DocNameSchema = new mongoose.Schema({
+  docId: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  docName: {
+    type: String,
+    default: "",
+  },
+});
+
+const DocNameModel = mongoose.model("DocName", DocNameSchema);
+
 const UserProfile = mongoose.model("UserProfile", userSchema);
 const Document = mongoose.model("Document", DocSchema);
 const Users = mongoose.model("User", UserSchema);
 const DocAccess = mongoose.model("Access", DocAccessSchema);
 const AccessReq = mongoose.model("Access-Request", AccessRequest);
 
-module.exports = { db, Document, Users, UserProfile, DocAccess, AccessReq };
+module.exports = {
+  db,
+  Document,
+  Users,
+  UserProfile,
+  DocAccess,
+  AccessReq,
+  DocNameModel,
+};

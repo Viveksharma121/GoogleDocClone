@@ -4,47 +4,105 @@ import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import React, { useState } from "react";
+import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
+import Summary from "./Summary/Summary";
+const MenuBar = ({ QuillData }) => {
+  let value = QuillData;
+  // Assuming value is an HTML string
+  const tempDiv = document.createElement("div");
+  tempDiv.innerHTML = value;
 
-const MenuBar = () => {
-  console.log("hurray");
-  const [menuAnchor, setMenuAnchor] = useState(null);
+  const textContent = tempDiv.textContent || tempDiv.innerText;
+  console.log(textContent.trim());
+  value = textContent.trim();
+
+  const [fileMenuAnchor, setFileMenuAnchor] = useState(null);
   const [docName, setDocName] = useState("");
+  const docId1 = useParams();
+  const docId = docId1.docId;
 
-  const handleDocName = () => {
-    console.log("save as");
-    const document_name = prompt("Enter doc name ");
-    setDocName(document_name);
-    handleMenuClose();
+  useEffect(() => {
+    const fetchData = async () => {
+      console.log(docId);
+      try {
+        const response = await axios.get("http://localhost:9000/doc-name", {
+          params: { docId },
+        });
+        console.log(response);
+        setDocName(response.data.docName);
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
+
+    fetchData();
+  }, [docId]);
+
+  const [isSummarymodelOpen, setisSummarymodelOpen] = useState(false);
+  const [summaryValue, setSummaryValue] = useState("");
+  const handleCloseSummaryModal = () => {
+    setisSummarymodelOpen(false);
   };
 
-  const handleMenuOpen = (event) => {
-    setMenuAnchor(event.currentTarget);
+  const handleDocName = async () => {
+    console.log("save as");
+    const document_name = prompt("Enter doc name ");
+    console.log(document_name);
+    const response = await axios.post("http://localhost:9000/doc-name", {
+      docId: docId,
+      docName: document_name,
+    });
+    console.log(response.data.message.docName);
+    setDocName(response.data.message.docName);
+    handleFileMenuClose();
+  };
+
+  const handleFileMenuOpen = (event) => {
+    setFileMenuAnchor(event.currentTarget);
+  };
+
+  const handleFileMenuClose = () => {
+    setFileMenuAnchor(null);
   };
 
   const handleSave = () => {
-    console.log("Save clicked");
-    // Add logic for saving the document
-    handleMenuClose();
-  };
-
-  const handleMenuClose = () => {
-    setMenuAnchor(null);
+    console.log(docName);
+    handleFileMenuClose();
   };
 
   const handleMenuItemClick = (option) => {
-    setDocName(option);
-    handleMenuClose();
+    console.log(`Clicked ${option}`);
+    handleFileMenuClose();
+  };
+  const handleSummary = async () => {
+    console.log("called");
+    try {
+      const response = await axios.get(
+        `http://localhost:9000/api/sum/summary?doc=${encodeURIComponent(value)}`
+      );
+      console.log(response.data.summary);
+      setSummaryValue(response.data.summary);
+      setisSummarymodelOpen(true);
+    } catch (error) {
+      console.error("Error during summarization:", error);
+    }
   };
 
   return (
     <>
+      <Summary
+        isOpen={isSummarymodelOpen}
+        onClose={handleCloseSummaryModal}
+        summary={summaryValue}
+      />
       <Toolbar>
         {/* Google Doc icon with text */}
         <div style={{ display: "flex", alignItems: "center" }}>
           <IconButton
             color="inherit"
-            onClick={handleMenuOpen}
+            onClick={handleFileMenuOpen}
             style={{ padding: "0" }}
           >
             <img
@@ -63,9 +121,9 @@ const MenuBar = () => {
           >
             <Typography
               variant="caption"
-              style={{ fontSize: "16px", marginLeft: "2px", padding: 0 }}
+              style={{ fontSize: "17px", marginLeft: "5px", padding: 0 }}
             >
-              Google Doc
+              {docName === null ? "Google Doc" : docName}
             </Typography>
 
             {/* Menu options */}
@@ -81,23 +139,21 @@ const MenuBar = () => {
                 color="inherit"
                 aria-controls="file-menu"
                 aria-haspopup="true"
-                onClick={handleMenuOpen}
+                onClick={handleFileMenuOpen}
               >
                 File
               </Button>
               <Menu
                 id="file-menu"
-                anchorEl={menuAnchor}
+                anchorEl={fileMenuAnchor}
                 keepMounted
-                open={Boolean(menuAnchor)}
-                onClose={handleMenuClose}
+                open={Boolean(fileMenuAnchor)}
+                onClose={handleFileMenuClose}
               >
                 <MenuItem onClick={() => handleMenuItemClick("New Document")}>
                   New Document
                 </MenuItem>
-                <MenuItem onClick={() => handleMenuItemClick("Save")}>
-                  Save
-                </MenuItem>
+                <MenuItem onClick={handleSave}>Save</MenuItem>
                 <MenuItem onClick={handleDocName}>Save As</MenuItem>
                 {/* Add more File options as needed */}
               </Menu>
@@ -106,56 +162,19 @@ const MenuBar = () => {
               <Button
                 color="inherit"
                 aria-controls="edit-menu"
-                aria-haspopup="true"
-                onClick={handleMenuOpen}
+                aria-haspopup="true" // Implement Edit menu functions
               >
                 Edit
               </Button>
-              <Menu
-                id="edit-menu"
-                anchorEl={menuAnchor}
-                keepMounted
-                open={Boolean(menuAnchor)}
-                onClose={handleMenuClose}
-              >
-                {/* Add Edit menu options as needed */}
-              </Menu>
-
               <Button
                 color="inherit"
-                aria-controls="view-menu"
-                aria-haspopup="true"
-                onClick={handleMenuOpen}
+                aria-controls="edit-menu"
+                aria-haspopup="true" // Implement Edit menu functions
+                onClick={handleSummary}
               >
-                View
+                Summarise
               </Button>
-
-              <Button
-                color="inherit"
-                aria-controls="insert-menu"
-                aria-haspopup="true"
-                onClick={handleMenuOpen}
-              >
-                Insert
-              </Button>
-
-              <Button
-                color="inherit"
-                aria-controls="format-menu"
-                aria-haspopup="true"
-                onClick={handleMenuOpen}
-              >
-                Format
-              </Button>
-
-              <Button
-                color="inherit"
-                aria-controls="help-menu"
-                aria-haspopup="true"
-                onClick={handleMenuOpen}
-              >
-                Help
-              </Button>
+              {/* Add other menu buttons similarly */}
             </div>
           </div>
         </div>
