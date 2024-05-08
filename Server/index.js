@@ -11,7 +11,6 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 const PORT = 5000;
 const PORT1 = 9000;
-const uploadPath = "Images";
 db()
   .then(() => {
     app.listen(PORT1, () => {
@@ -36,18 +35,6 @@ app.use("/api/access", access_route);
 app.use("/api/user", user_route);
 app.use("/api/share", share_route);
 app.use("/api/sum", summary_route);
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "Images");
-  },
-  filename: (req, file, cb) => {
-    console.log(file + " image filename");
-    cb(null, Date.now() + path.extname(file.originalname));
-  },
-});
-
-const upload = multer({ storage: storage });
-app.use("/uploads", express.static(uploadPath));
 
 //access perm
 
@@ -147,6 +134,9 @@ app.post("doc-name", async (req, res) => {
     console.error("Error saving document name:", error);
     res.status(500).json({ success: false, message: "Internal server error." });
   }
+});
+app.get("/", async (req, res) => {
+  res.json({ message: "close it" });
 });
 
 app.post("/doc-name", async (req, res) => {
