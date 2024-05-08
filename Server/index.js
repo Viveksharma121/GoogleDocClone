@@ -37,7 +37,9 @@ app.use("/api/share", share_route);
 // app.use("/api/sum", summary_route);
 
 //access perm
-
+app.get("/", async (req, res) => {
+  res.json({ message: "close it" });
+});
 //code to save to db
 app.get("/get-doc-content/:docId", async (req, res) => {
   const { docId } = req.params;
@@ -134,9 +136,6 @@ app.post("doc-name", async (req, res) => {
     console.error("Error saving document name:", error);
     res.status(500).json({ success: false, message: "Internal server error." });
   }
-});
-app.get("/", async (req, res) => {
-  res.json({ message: "close it" });
 });
 
 app.post("/doc-name", async (req, res) => {
