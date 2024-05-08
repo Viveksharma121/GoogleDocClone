@@ -5,7 +5,7 @@ const db = async () => {
     //connect mongo
     mongoose.set("strictQuery", false);
     await mongoose
-      .connect("mongodb://localhost:27017/Doc", {
+      .connect("mongodb+srv://student:student123@cluster0.vpqpeal.mongodb.net/studentDB", {
         useNewUrlParser: true,
         useUnifiedTopology: true,
         family: 4,
