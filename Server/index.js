@@ -30,11 +30,11 @@ const io = new Server(PORT, {
 const user_route = require("./Routes/Auth");
 const share_route = require("./Routes/Share");
 const access_route = require("./Routes/DocAccess");
-const summary_route = require("./Routes/Summariser");
+// const summary_route = require("./Routes/Summariser");
 app.use("/api/access", access_route);
 app.use("/api/user", user_route);
 app.use("/api/share", share_route);
-app.use("/api/sum", summary_route);
+// app.use("/api/sum", summary_route);
 
 //access perm
 
