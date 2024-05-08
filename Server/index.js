@@ -174,3 +174,6 @@ app.get("/doc-name", async (req, res) => {
     res.json({ message: error });
   }
 });
+app.get("/",async(req,res)=>{
+  res.json("namaste ji");
+}
