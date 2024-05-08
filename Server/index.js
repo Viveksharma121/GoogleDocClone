@@ -176,4 +176,4 @@ app.get("/doc-name", async (req, res) => {
 });
 app.get("/",async(req,res)=>{
   res.json("namaste ji");
-}
+});
