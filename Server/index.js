@@ -37,8 +37,8 @@ app.use("/api/share", share_route);
 // app.use("/api/sum", summary_route);
 
 //access perm
-app.get("/", async (req, res) => {
-  res.json({ message: "close it" });
+app.get("/", (req, res) => {
+  res.json("Hello hi namaste");
 });
 //code to save to db
 app.get("/get-doc-content/:docId", async (req, res) => {
