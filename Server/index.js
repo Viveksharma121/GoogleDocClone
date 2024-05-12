@@ -18,12 +18,12 @@ db()
   .catch((error) => {
     console.log("Failed to connect" + error);
   });
-// const io = new Server(PORT, {
-//   cors: {
-//     origin: "*",
-//     methods: ["GET", "POST"],
-//   },
-// });
+const io = new Server(PORT, {
+  cors: {
+    origin: "*",
+    methods: ["GET", "POST"],
+  },
+});
 
 // const user_route = require("./Routes/Auth");
 // const share_route = require("./Routes/Share");
