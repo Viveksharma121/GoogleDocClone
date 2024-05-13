@@ -13,7 +13,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import "./Modal.css";
 function Modal({ isOpen, onClose, urlToShare }) {
-  //Accesses the document id form the link so if link is http://localhost:3000/doc/d27284b3-e364-4a92-9b19-50d442884d91 , it accesses doc/d27284b3-e364-4a92-9b19-50d442884d91
+  //Accesses the document id form the link so if link is http://192.168.117.153:3000/doc/d27284b3-e364-4a92-9b19-50d442884d91 , it accesses doc/d27284b3-e364-4a92-9b19-50d442884d91
   const docId1 = useParams();
   // to get the id from the docId1 "d27284b3-e364-4a92-9b19-50d442884d91"
   const docId = docId1.docId;
@@ -35,7 +35,7 @@ function Modal({ isOpen, onClose, urlToShare }) {
     const fetchAcessControl = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:9000/api/share/getusers/${docId}`
+          `${BackendUrl}api/share/getusers/${docId}`
         );
         console.log(response);
         const data = response.data.accessControl;
@@ -105,7 +105,7 @@ function Modal({ isOpen, onClose, urlToShare }) {
   const handleGiveAccess = async () => {
     console.log(accessLevels);
     const response = await axios.post(
-      `http://localhost:9000/api/share/access-levels/${docId}`,
+      `${BackendUrl}api/share/access-levels/${docId}`,
       {
         accessLevels: Object.entries(accessLevels).map(([user, level]) => ({
           userEmail: user,

@@ -3,12 +3,13 @@ import React, { useEffect, useState } from "react";
 import "./Homepage.css";
 
 function Homepage() {
+  const BackendUrl = process.env.REACT_APP_BASE_URL;
   const userEmail = sessionStorage.getItem("email");
   const [doc, setdoc] = useState([]);
   useEffect(() => {
     const fetchAndStore = async () => {
       const response = await axios.get(
-        `http://localhost:9000/api/share/user-docs/${userEmail}`
+        `${BackendUrl}api/share/user-docs/${userEmail}`
       );
       console.log(response.data.userDocs);
       setdoc(response.data.userDocs);

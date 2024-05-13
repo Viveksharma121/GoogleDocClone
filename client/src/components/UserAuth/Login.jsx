@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "./Login.css";
 
 const LoginPage = () => {
+  const BackendUrl = process.env.REACT_APP_BASE_URL;
   const [name, setname] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -13,10 +14,7 @@ const LoginPage = () => {
     sessionStorage.setItem("name", name);
     const data = { email: email, password: password };
     console.log("Login button clicked");
-    const response = await axios.post(
-      "http://localhost:9000/api/user/login",
-      data
-    );
+    const response = await axios.post(`${BackendUrl}api/user/login`, data);
     const userdata = response.data;
     if (!userdata.user) {
       window.alert("Email does no exist or login failed. Please try again.");

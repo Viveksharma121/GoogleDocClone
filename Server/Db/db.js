@@ -5,9 +5,7 @@ const db = async () => {
     //connect mongo
     mongoose.set("strictQuery", false);
     await mongoose
-      .connect(
-        "mongodb+srv://student:student123@cluster0.vpqpeal.mongodb.net/studentDB"
-      )
+      .connect("mongodb://localhost:27017/Doc")
       .then(() => {
         console.log("Db connected");
       })

@@ -12,7 +12,9 @@ import { default as ReactQuill } from "react-quill";
 import "react-quill/dist/quill.snow.css";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
 //socketio for connections and room forming
+// import dotenv from "dotenv";
 import socketioClient from "socket.io-client";
+
 //css for the page
 import "./DocPage.css";
 // modal
@@ -20,7 +22,12 @@ import AccessRequestsModal from "./AccessDenied/AccessReqModal";
 import MenuBar from "./MenuBar";
 import Modal from "./Modal/Modal";
 const DocPage = () => {
-  //Accesses the document id form the link so if link is http://localhost:3000/doc/d27284b3-e364-4a92-9b19-50d442884d91 , it accesses doc/d27284b3-e364-4a92-9b19-50d442884d91
+  // dotenv.config();
+  const BackendUrl = process.env.REACT_APP_BASE_URL;
+
+  const socket_url = process.env.REACT_APP_SOCKET_URL;
+
+  //Accesses the document id form the link so if link is http://192.168.117.153:3000/doc/d27284b3-e364-4a92-9b19-50d442884d91 , it accesses doc/d27284b3-e364-4a92-9b19-50d442884d91
   const docId1 = useParams();
   // to get the id from the docId1 "d27284b3-e364-4a92-9b19-50d442884d91"
   const docId = docId1.docId;
@@ -42,7 +49,7 @@ const DocPage = () => {
     const fetchAcessControl = async () => {
       try {
         const response = await axios.get(
-          `http://localhost:9000/api/share/getusers/${docId}`
+          `${BackendUrl}api/share/getusers/${docId}`
         );
         console.log(response);
         const data = response.data.accessControl;
@@ -81,7 +88,7 @@ const DocPage = () => {
     //one more
     const handleAccess = async () => {
       const response = await axios.get(
-        "http://localhost:9000/api/access/get-access-request",
+        `${BackendUrl}api/access/get-access-request`,
         {
           params: {
             docId: docId,
@@ -128,9 +135,7 @@ const DocPage = () => {
   const fetchInitialContent = async () => {
     try {
       //simple get request
-      const response = await axios.get(
-        `http://localhost:9000/get-doc-content/${docId}`
-      );
+      const response = await axios.get(`${BackendUrl}get-doc-content/${docId}`);
       //extracting the data from response
       const data = response.data;
       // data: content: "<p>iv </p><p>gi </p><p>vivek </p>"
@@ -144,7 +149,7 @@ const DocPage = () => {
     console.log("useEffect is running");
 
     //creates a new Websocket connection
-    const newSocket = socketioClient("http://localhost:5000", {
+    const newSocket = socketioClient(`${socket_url}`, {
       //optional
       transports: ["websocket"],
     });
@@ -282,7 +287,7 @@ const DocPage = () => {
       <Modal
         isOpen={ismodelOpen}
         onClose={handleCloseModal}
-        urlToShare={`http://localhost:3000${PageUrl.pathname}`}
+        urlToShare={`http://192.168.117.153:3000${PageUrl.pathname}`}
       />
       <button onClick={textTovoice}>Text to voice</button>
     </div>

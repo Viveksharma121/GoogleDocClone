@@ -8,6 +8,7 @@ import Avatar from "react-avatar";
 import "./Profile.css";
 
 const Profile = () => {
+  const BackendUrl = process.env.REACT_APP_BASE_URL;
   const [username, setUsername] = useState();
   const [avatar, setAvatar] = useState("");
   const [isEditingBio, setEditingBio] = useState(false);
@@ -24,7 +25,7 @@ const Profile = () => {
     const fetchbio = async () => {
       console.log(username);
       const response = await axios.get(
-        `http://localhost:9000/api/user/bio?username=${name}`
+        `${BackendUrl}api/user/bio?username=${name}`
       );
 
       console.log(response.data.bio);
@@ -41,10 +42,10 @@ const Profile = () => {
     // bio form backend fetch
     try {
       console.log(editedBio);
-      const response = await axios.put(
-        "http://localhost:9000/api/user/savebio",
-        { username, bio: editedBio }
-      );
+      const response = await axios.put(`${BackendUrl}api/user/savebio`, {
+        username,
+        bio: editedBio,
+      });
       console.log(response);
     } catch (error) {
       console.log(error);

@@ -5,6 +5,7 @@ import { useNavigate } from "react-router-dom";
 import "./Reg.css";
 
 const RegistrationPage = () => {
+  const BackendUrl = process.env.REACT_APP_BASE_URL;
   // const { login, user } = useAuth();
   const history = useNavigate();
   const [formData, setFormData] = useState({
@@ -26,10 +27,10 @@ const RegistrationPage = () => {
 
     try {
       const response = await axios.post(
-        "http://localhost:9000/api/user/register",
+        `${BackendUrl}api/user/register`,
         formData
       );
-      // const response1=await axios.post("http://localhost:9000/api/user/register",formData.username);
+      // const response1=await axios.post("${BackendUrl}api/user/register",formData.username);
       console.log("Registration successful:", response.data);
       console.log(response.data);
       if (response.status === 201) {

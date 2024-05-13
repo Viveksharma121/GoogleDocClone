@@ -9,6 +9,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import Summary from "./Summary/Summary";
 const MenuBar = ({ QuillData }) => {
+  const BackendUrl = process.env.REACT_APP_BASE_URL;
   let value = QuillData;
   // Assuming value is an HTML string
   const tempDiv = document.createElement("div");
@@ -27,7 +28,7 @@ const MenuBar = ({ QuillData }) => {
     const fetchData = async () => {
       console.log(docId);
       try {
-        const response = await axios.get("http://localhost:9000/doc-name", {
+        const response = await axios.get(`${BackendUrl}doc-name`, {
           params: { docId },
         });
         console.log(response);
@@ -50,7 +51,7 @@ const MenuBar = ({ QuillData }) => {
     console.log("save as");
     const document_name = prompt("Enter doc name ");
     console.log(document_name);
-    const response = await axios.post("http://localhost:9000/doc-name", {
+    const response = await axios.post(`${BackendUrl}doc-name`, {
       docId: docId,
       docName: document_name,
     });
@@ -80,7 +81,7 @@ const MenuBar = ({ QuillData }) => {
     console.log("called");
     try {
       const response = await axios.get(
-        `http://localhost:9000/api/sum/summary?doc=${encodeURIComponent(value)}`
+        `${BackendUrl}api/sum/summary?doc=${encodeURIComponent(value)}`
       );
       console.log(response.data.summary);
       setSummaryValue(response.data.summary);

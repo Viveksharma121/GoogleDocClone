@@ -14,6 +14,7 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 
 const AccessRequestsModal = ({ isOpen, onClose, usersReq }) => {
+  const BackendUrl = process.env.REACT_APP_BASE_URL;
   console.log(onClose);
   // Sample array of users (replace with your data)
   const docId1 = useParams();
@@ -46,7 +47,7 @@ const AccessRequestsModal = ({ isOpen, onClose, usersReq }) => {
     // console.log("Access granted to:", users);
     // // console.log(accessLevels);
     const response = await axios.post(
-      `http://localhost:9000/api/share/access-levels/${docId}`,
+      `${BackendUrl}api/share/access-levels/${docId}`,
       {
         accessLevels: users.map((user) => ({
           userEmail: user.userEmail,
@@ -59,7 +60,7 @@ const AccessRequestsModal = ({ isOpen, onClose, usersReq }) => {
     if (response.status === 200) {
       console.log("hahah");
       const response = await axios.delete(
-        `http://localhost:9000/api/access/delete-access/${docId}`
+        `${BackendUrl}api/access/delete-access/${docId}`
       );
       console.log(response);
       setUsers([]);
@@ -68,7 +69,7 @@ const AccessRequestsModal = ({ isOpen, onClose, usersReq }) => {
   };
 
   const handleClose = async () => {
-    const response = await axios.get("http://localhost:9000/api/access");
+    const response = await axios.get(`${BackendUrl}api/access`);
     console.log(response);
     await onClose();
   };

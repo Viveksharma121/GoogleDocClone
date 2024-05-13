@@ -6,6 +6,7 @@ import { useParams } from "react-router-dom";
 import "./DocAccess.css";
 
 const DocumentPage = () => {
+  const BackendUrl = process.env.REACT_APP_BASE_URL;
   const [hasAccess, setHasAccess] = useState(false);
   const [requestSent, setRequestSent] = useState(false);
   const [email, setemail] = useState("vivek@gmail.com");
@@ -23,7 +24,7 @@ const DocumentPage = () => {
     try {
       console.log(email + "    " + selectedAccess);
       const response = await axios.post(
-        "http://localhost:9000/api/access/access-request",
+        `${BackendUrl}api/access/access-request`,
         {
           docId: docId,
           accessLevels: [

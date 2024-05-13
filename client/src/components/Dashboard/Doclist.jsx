@@ -4,6 +4,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import "./Doclist.css";
 function Doclist({ docId }) {
+  const BackendUrl = process.env.REACT_APP_BASE_URL;
   docId = docId;
   console.log(docId);
   const user = sessionStorage.getItem("email");
@@ -11,7 +12,7 @@ function Doclist({ docId }) {
   const handleGiveAccess = async () => {
     console.log("handle give access called");
     const response = await axios.post(
-      `http://localhost:9000/api/share/access-levels/${docId}`,
+      `${BackendUrl}api/share/access-levels/${docId}`,
       {
         accessLevels: [
           {
