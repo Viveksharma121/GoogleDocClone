@@ -152,3 +152,5 @@ app.get("/doc-name", async (req, res) => {
     res.json({ message: error });
   }
 });
+
+module.exports = app; // <-- This is the key part to fix the export issue
