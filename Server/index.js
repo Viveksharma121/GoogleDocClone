@@ -10,6 +10,7 @@ const server = http.createServer(app);
 
 const allowedOrigins = [
   "http://localhost:3000",
+  "http://localhost:5000",
   "https://google-doc-clone-lemon.vercel.app",
 ];
 app.use(
