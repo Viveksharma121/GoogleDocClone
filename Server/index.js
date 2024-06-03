@@ -8,7 +8,21 @@ const app = express();
 const http = require("http");
 const server = http.createServer(app);
 
-app.use(cors());
+const allowedOrigins = [
+  "http://localhost:3000",
+  "https://google-doc-clone-lemon.vercel.app",
+];
+app.use(
+  cors({
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
+  })
+);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -153,4 +167,4 @@ app.get("/doc-name", async (req, res) => {
   }
 });
 
-module.exports = app; // <-- This is the key part to fix the export issue
+module.exports = app;

@@ -5,24 +5,38 @@ import "./Login.css";
 
 const LoginPage = () => {
   const BackendUrl = process.env.REACT_APP_BASE_URL;
-  const [name, setname] = useState("");
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const history = useNavigate();
+  const navigate = useNavigate();
+
   const handleLogin = async (e) => {
     e.preventDefault();
     sessionStorage.setItem("name", name);
     const data = { email: email, password: password };
     console.log("Login button clicked");
-    const response = await axios.post(`${BackendUrl}api/user/login`, data);
-    const userdata = response.data;
-    if (!userdata.user) {
-      window.alert("Email does no exist or login failed. Please try again.");
-      return;
+
+    try {
+      console.log("iupate hua kya", BackendUrl);
+      const response = await axios.post(`${BackendUrl}api/user/login`, data);
+      const userdata = response.data;
+      if (!userdata.user) {
+        window.alert("Email does not exist or login failed. Please try again.");
+        return;
+      }
+      sessionStorage.setItem("email", email);
+      console.log(sessionStorage);
+      navigate("/main");
+    } catch (error) {
+      console.error(
+        "Login failed:",
+        error.response ? error.response.data : error.message
+      );
     }
-    sessionStorage.setItem("email", email);
-    console.log(sessionStorage);
-    history("/main");
+  };
+
+  const navigateToRegister = () => {
+    navigate("/");
   };
 
   return (
@@ -31,9 +45,9 @@ const LoginPage = () => {
         <h2>Login</h2>
         <label>Username:</label>
         <input
-          type="name"
+          type="text"
           value={name}
-          onChange={(e) => setname(e.target.value)}
+          onChange={(e) => setName(e.target.value)}
           required
         />
         <label>Email:</label>
@@ -51,6 +65,9 @@ const LoginPage = () => {
           required
         />
         <button type="submit">Login</button>
+        <button type="button" onClick={navigateToRegister}>
+          Register
+        </button>
       </form>
     </div>
   );

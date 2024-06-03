@@ -1,13 +1,11 @@
 import axios from "axios";
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-// import { useAuth } from "../store/AuthProvider";
 import "./Reg.css";
 
 const RegistrationPage = () => {
   const BackendUrl = process.env.REACT_APP_BASE_URL;
-  // const { login, user } = useAuth();
-  const history = useNavigate();
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -21,36 +19,31 @@ const RegistrationPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log("Backend");
-    console.log(formData);
     localStorage.setItem("username", formData.username);
 
     try {
+      console.log("Form data:", formData);
       const response = await axios.post(
         `${BackendUrl}api/user/register`,
         formData
       );
-      // const response1=await axios.post("${BackendUrl}api/user/register",formData.username);
       console.log("Registration successful:", response.data);
-      console.log(response.data);
       if (response.status === 201) {
         localStorage.setItem("user", formData.email);
-        // await login(formData.email);
-        // console.log(login);
-        // console.log(user.email);
-        history("/login");
+        navigate("/login");
       }
-      // console.log(response1);
-      // Redirect or show success message
     } catch (error) {
-      console.error("Registration failed:", error.response.data);
-      // Handle errors, e.g., display error messages
+      if (error.response) {
+        console.error("Registration failed:", error.response.data);
+      } else {
+        console.error("Registration failed:", error.message);
+      }
     }
   };
 
   return (
-    <div>
-      <h2>Registration Page</h2>
+    <div className="container">
+      <h2 className="title">Registration Page</h2>
       <form onSubmit={handleSubmit}>
         <label>
           Username:
@@ -59,9 +52,9 @@ const RegistrationPage = () => {
             name="username"
             value={formData.username}
             onChange={handleChange}
+            required
           />
         </label>
-        <br />
         <label>
           Email:
           <input
@@ -69,9 +62,9 @@ const RegistrationPage = () => {
             name="email"
             value={formData.email}
             onChange={handleChange}
+            required
           />
         </label>
-        <br />
         <label>
           Password:
           <input
@@ -79,12 +72,15 @@ const RegistrationPage = () => {
             name="password"
             value={formData.password}
             onChange={handleChange}
+            required
           />
         </label>
-        <br />
-        <button type="submit" onClick={handleSubmit}>
-          Register
-        </button>
+        <div className="button-container">
+          <button type="submit">Register</button>
+          <button type="button" onClick={() => navigate("/login")}>
+            Login
+          </button>
+        </div>
       </form>
     </div>
   );
