@@ -5,7 +5,9 @@ const db = async () => {
     //connect mongo
     mongoose.set("strictQuery", false);
     await mongoose
-      .connect("mongodb://0.0.0.0:27017/Doc")
+      .connect(
+        "mongodb+srv://vivekksharma369:J3J9W7sdLICGBgQp@cluster0.b7qpjos.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0"
+      )
       .then(() => {
         console.log("Db connected");
       })
