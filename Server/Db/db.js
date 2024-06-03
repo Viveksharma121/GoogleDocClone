@@ -5,7 +5,7 @@ const db = async () => {
     //connect mongo
     mongoose.set("strictQuery", false);
     await mongoose
-      .connect("mongodb://localhost:27017/Doc")
+      .connect("mongodb://0.0.0.0:27017/Doc")
       .then(() => {
         console.log("Db connected");
       })
