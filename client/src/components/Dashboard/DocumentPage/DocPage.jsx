@@ -289,6 +289,7 @@ const DocPage = () => {
         onClose={handleCloseModal}
         urlToShare={`http://192.168.117.153:3000${PageUrl.pathname}`}
       />
+
       <button onClick={textTovoice}>Text to voice</button>
     </div>
   );

@@ -3,13 +3,15 @@ const { db, Document, UserProfile, DocNameModel } = require("./Db/db");
 const express = require("express");
 const cors = require("cors");
 const bodyParser = require("body-parser");
-
+const { exec } = require("child_process");
+const path = require("path");
 const app = express();
 const http = require("http");
 const server = http.createServer(app);
 
 const allowedOrigins = [
   "http://localhost:3000",
+  "http://localhost:3001",
   "http://localhost:3000/doc/c1ae16b1-56ea-48a1-bb6b-618a19fb5c9e",
   "http://localhost:5000",
   "https://google-doc-clone-lemon.vercel.app",
@@ -134,6 +136,22 @@ app.delete("/del", async (req, res) => {
     console.error(error);
     res.status(500).json({ error: "Internal Server Error" });
   }
+});
+
+app.post("/summarize", (req, res) => {
+  const content = req.body.content;
+  const pythonScriptPath = path.join(__dirname, "pyt", "abc.py");
+  // Ensure to properly escape the content to avoid shell injection
+  const safeContent = JSON.stringify(content);
+
+  exec(`python ${pythonScriptPath} ${safeContent}`, (error, stdout, stderr) => {
+    if (error) {
+      console.error(`exec error: ${error}`);
+      return res.status(500).json({ error: "Failed to summarize document" });
+    }
+
+    res.json({ summary: stdout.trim() });
+  });
 });
 
 app.post("/doc-name", async (req, res) => {

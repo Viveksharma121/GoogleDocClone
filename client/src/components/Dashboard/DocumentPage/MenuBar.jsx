@@ -44,7 +44,7 @@ const MenuBar = ({ QuillData }) => {
   const [isSummarymodelOpen, setisSummarymodelOpen] = useState(false);
   const [summaryValue, setSummaryValue] = useState("");
   const handleCloseSummaryModal = () => {
-    setisSummarymodelOpen(false);
+    setIsSummaryModalOpen(false);
   };
 
   const handleDocName = async () => {
@@ -77,26 +77,29 @@ const MenuBar = ({ QuillData }) => {
     console.log(`Clicked ${option}`);
     handleFileMenuClose();
   };
-  const handleSummary = async () => {
-    console.log("called");
+  //summary
+  const handleSummarize = async () => {
     try {
-      const response = await axios.get(
-        `${BackendUrl}api/sum/summary?doc=${encodeURIComponent(value)}`
-      );
-      console.log(response.data.summary);
-      setSummaryValue(response.data.summary);
-      setisSummarymodelOpen(true);
+      const response = await axios.post(`${BackendUrl}summarize`, {
+        content: value,
+      });
+      setSummary(response.data.summary);
+      setIsSummaryModalOpen(true);
     } catch (error) {
-      console.error("Error during summarization:", error);
+      console.log(error);
     }
   };
+
+  // State to manage the summary and modal visibility
+  const [summary, setSummary] = useState("");
+  const [isSummaryModalOpen, setIsSummaryModalOpen] = useState(false);
 
   return (
     <>
       <Summary
-        isOpen={isSummarymodelOpen}
+        isOpen={isSummaryModalOpen}
         onClose={handleCloseSummaryModal}
-        summary={summaryValue}
+        summary={summary}
       />
       <Toolbar>
         {/* Google Doc icon with text */}
@@ -171,11 +174,20 @@ const MenuBar = ({ QuillData }) => {
                 color="inherit"
                 aria-controls="edit-menu"
                 aria-haspopup="true" // Implement Edit menu functions
-                onClick={handleSummary}
+                onClick={handleSummarize}
               >
                 Summarise
               </Button>
               {/* Add other menu buttons similarly */}
+              {/* <Modal
+                isOpen={isSummaryModalOpen}
+                onClose={() => setIsSummaryModalOpen(false)}
+              >
+                <div>
+                  <h2>Document Summary</h2>
+                  <p>{summary}</p>
+                </div>
+              </Modal> */}
             </div>
           </div>
         </div>
